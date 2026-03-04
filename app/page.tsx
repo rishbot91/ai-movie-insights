@@ -1,11 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+type Movie = {
+  Title: string;
+  Year: string;
+  Poster: string;
+  Plot: string;
+  Actors: string;
+  imdbRating: string;
+};
 
 export default function Home() {
   const [imdbId, setImdbId] = useState("");
+  const [movie, setMovie] = useState<Movie | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [movie, setMovie] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -30,65 +43,70 @@ export default function Home() {
       }
 
       setMovie(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Unexpected error occurred");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-900 p-6">
-      <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md">
-
-        <h1 className="text-2xl font-bold mb-4 text-black">
+    <main className="min-h-screen bg-slate-950 text-white p-6">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <h1 className="text-4xl font-bold text-center">
           AI Movie Insight Builder
         </h1>
 
-        <input
-          type="text"
-          value={imdbId}
-          onChange={(e) => setImdbId(e.target.value)}
-          placeholder="Enter IMDb ID (example: tt0133093)"
-          className="w-full border border-gray-400 rounded-lg px-4 py-2 mb-3 text-black"
-        />
-
-        <button
-          onClick={handleClick}
-          className="w-full bg-black text-white py-2 rounded-lg hover:opacity-90"
-        >
-          {loading ? "Loading..." : "Get Insights"}
-        </button>
-
-        {error && (
-          <p className="text-red-600 mt-3 text-sm">{error}</p>
-        )}
-
-        {movie && (
-          <div className="mt-6">
-            <img
-              src={movie.Poster}
-              alt={movie.Title}
-              className="rounded-lg mb-3"
+        <Card>
+          <CardContent className="p-6 flex gap-3">
+            <Input
+              placeholder="Enter IMDb ID (example: tt0133093)"
+              value={imdbId}
+              onChange={(e) => setImdbId(e.target.value)}
             />
 
-            <h2 className="text-xl font-semibold text-black">
-              {movie.Title}
-            </h2>
+            <Button onClick={handleClick}>
+              {loading ? "Loading..." : "Get Insights"}
+            </Button>
+          </CardContent>
+        </Card>
 
-            <p className="text-black">Year: {movie.Year}</p>
-            <p className="text-black">Rating: {movie.imdbRating}</p>
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
-            <p className="text-gray-700 mt-2">
-              {movie.Plot}
-            </p>
+        {movie && (
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <Image
+                  src={movie.Poster}
+                  alt={movie.Title}
+                  width={300}
+                  height={450}
+                  className="rounded-lg"
+                />
 
-            <p className="text-sm text-gray-600 mt-2">
-              Cast: {movie.Actors}
-            </p>
-          </div>
+                <div className="md:col-span-2 space-y-2">
+                  <h2 className="text-2xl font-semibold">{movie.Title}</h2>
+
+                  <p>Year: {movie.Year}</p>
+                  <p>Rating: {movie.imdbRating}</p>
+
+                  <p className="text-sm text-gray-400">Cast: {movie.Actors}</p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Plot</h3>
+
+                <p className="text-gray-300">{movie.Plot}</p>
+              </div>
+            </CardContent>
+          </Card>
         )}
-
       </div>
     </main>
   );
