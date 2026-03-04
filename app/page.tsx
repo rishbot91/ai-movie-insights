@@ -5,19 +5,36 @@ import { useState } from "react";
 export default function Home() {
   const [imdbId, setImdbId] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [movie, setMovie] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  function handleClick() {
+  async function handleClick() {
     setError(null);
+    setMovie(null);
 
     const trimmed = imdbId.trim();
 
-    // Validate IMDb format
     if (!/^tt\d{7,8}$/.test(trimmed)) {
       setError("Please enter a valid IMDb ID (example: tt0133093)");
       return;
     }
 
-    alert("Valid IMDb ID. Next step will fetch movie data.");
+    try {
+      setLoading(true);
+
+      const res = await fetch(`/api/movie?imdbId=${trimmed}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setMovie(data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -40,13 +57,36 @@ export default function Home() {
           onClick={handleClick}
           className="w-full bg-black text-white py-2 rounded-lg hover:opacity-90"
         >
-          Get Insights
+          {loading ? "Loading..." : "Get Insights"}
         </button>
 
         {error && (
-          <p className="text-red-600 mt-3 text-sm">
-            {error}
-          </p>
+          <p className="text-red-600 mt-3 text-sm">{error}</p>
+        )}
+
+        {movie && (
+          <div className="mt-6">
+            <img
+              src={movie.Poster}
+              alt={movie.Title}
+              className="rounded-lg mb-3"
+            />
+
+            <h2 className="text-xl font-semibold text-black">
+              {movie.Title}
+            </h2>
+
+            <p className="text-black">Year: {movie.Year}</p>
+            <p className="text-black">Rating: {movie.imdbRating}</p>
+
+            <p className="text-gray-700 mt-2">
+              {movie.Plot}
+            </p>
+
+            <p className="text-sm text-gray-600 mt-2">
+              Cast: {movie.Actors}
+            </p>
+          </div>
         )}
 
       </div>
