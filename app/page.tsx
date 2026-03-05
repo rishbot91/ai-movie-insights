@@ -1,113 +1,131 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import Image from "next/image";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react"
+import { AlertCircle } from "lucide-react"
 
-type Movie = {
-  Title: string;
-  Year: string;
-  Poster: string;
-  Plot: string;
-  Actors: string;
-  imdbRating: string;
-};
+import { MovieSearch } from "@/components/movie-search"
+import { MovieCard } from "@/components/movie-card"
+import { SentimentCard } from "@/components/sentiment-card"
+import {
+  MovieCardSkeleton,
+  SentimentCardSkeleton,
+} from "@/components/loading-skeletons"
 
-export default function Home() {
-  const [imdbId, setImdbId] = useState("");
-  const [movie, setMovie] = useState<Movie | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+import type { MovieData, SentimentAnalysis } from "@/lib/types"
 
-  async function handleClick() {
-    setError(null);
-    setMovie(null);
+export default function HomePage() {
 
-    const trimmed = imdbId.trim();
+  const [movie, setMovie] = useState<MovieData | null>(null)
+  const [sentiment, setSentiment] = useState<SentimentAnalysis | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-    if (!/^tt\d{7,8}$/.test(trimmed)) {
-      setError("Please enter a valid IMDb ID (example: tt0133093)");
-      return;
-    }
+  async function handleSearch(id: string) {
+
+    setError(null)
+    setMovie(null)
+    setSentiment(null)
+    setLoading(true)
 
     try {
-      setLoading(true);
 
-      const res = await fetch(`/api/movie?imdbId=${trimmed}`);
-      const data = await res.json();
+      const res = await fetch(`/api/movie?imdbId=${id}`)
+      const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
+        throw new Error(data.error || "Failed to fetch movie")
       }
 
-      setMovie(data);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Unexpected error occurred");
+      if (data.Response === "False") {
+        throw new Error(data.Error || "Movie not found")
       }
+
+      setMovie(data)
+
+      // Temporary sentiment data (replace later with AI)
+      setSentiment({
+        sentimentLabel: "Positive",
+        sentimentScore: 82,
+        summary:
+          "Audience reactions are largely positive, praising the performances, direction, and engaging storyline.",
+        keyThemes: ["Performances", "Storytelling", "Cinematography"],
+        audienceAppeal:
+          "Strong appeal for viewers who enjoy visually rich films with compelling characters and dramatic storytelling.",
+      })
+
+    } catch (err: unknown) {
+
+      if (err instanceof Error) {
+        setError(err.message)
+      } else {
+        setError("Unexpected error occurred")
+      }
+
     } finally {
-      setLoading(false);
+
+      setLoading(false)
+
     }
+
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-4xl font-bold text-center">
-          AI Movie Insight Builder
-        </h1>
+    <main className="min-h-screen bg-background">
 
-        <Card>
-          <CardContent className="p-6 flex gap-3">
-            <Input
-              placeholder="Enter IMDb ID (example: tt0133093)"
-              value={imdbId}
-              onChange={(e) => setImdbId(e.target.value)}
-            />
-
-            <Button onClick={handleClick}>
-              {loading ? "Loading..." : "Get Insights"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {error && <p className="text-red-500 text-center">{error}</p>}
-
-        {movie && (
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                <Image
-                  src={movie.Poster}
-                  alt={movie.Title}
-                  width={300}
-                  height={450}
-                  className="rounded-lg"
-                />
-
-                <div className="md:col-span-2 space-y-2">
-                  <h2 className="text-2xl font-semibold">{movie.Title}</h2>
-
-                  <p>Year: {movie.Year}</p>
-                  <p>Rating: {movie.imdbRating}</p>
-
-                  <p className="text-sm text-gray-400">Cast: {movie.Actors}</p>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2">Plot</h3>
-
-                <p className="text-gray-300">{movie.Plot}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      {/* Background glow */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-1/2 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
+        <div className="absolute top-1/3 -left-1/4 h-72 w-72 rounded-full bg-primary/3 blur-3xl" />
       </div>
+
+      <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12 sm:py-16">
+
+        {/* Search Section */}
+        <section>
+          <MovieSearch onSearch={handleSearch} isLoading={loading} />
+        </section>
+
+        {/* Error State */}
+        {error && (
+          <div
+            className="mx-auto flex max-w-md items-center gap-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 animate-in fade-in slide-in-from-bottom-2 duration-300"
+            role="alert"
+          >
+            <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
+            <p className="text-sm text-destructive">{error}</p>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col gap-6">
+            <MovieCardSkeleton />
+            <SentimentCardSkeleton />
+          </div>
+        )}
+
+        {/* Results */}
+        {movie && !loading && (
+          <div className="flex flex-col gap-6">
+            <MovieCard movie={movie} />
+            {sentiment && <SentimentCard sentiment={sentiment} />}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!movie && !loading && !error && (
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <p className="text-sm text-muted-foreground">
+              Enter an IMDb ID above to get started
+            </p>
+            <p className="text-xs text-muted-foreground/60">
+              Tip: Example — imdb.com/title/tt1375666
+            </p>
+          </div>
+        )}
+
+      </div>
+
     </main>
-  );
+  )
 }
