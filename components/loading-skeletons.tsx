@@ -45,7 +45,7 @@ export function MovieCardSkeleton() {
 
 export function SentimentCardSkeleton() {
   return (
-    <Card className="border-border bg-card animate-in fade-in duration-300 delay-100">
+    <Card className="border-border bg-card animate-in fade-in duration-300 ">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-48" />

@@ -53,7 +53,7 @@ export function SentimentCard({ sentiment }: SentimentCardProps) {
   const SentimentIcon = config.icon
 
   return (
-    <Card className="border-border bg-card animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150">
+    <Card className="border-border bg-card animate-in fade-in slide-in-from-bottom-4 duration-500">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -107,9 +107,9 @@ export function SentimentCard({ sentiment }: SentimentCardProps) {
             Key Themes
           </span>
           <div className="flex flex-wrap gap-1.5">
-            {sentiment.keyThemes.map((theme, i) => (
+            {sentiment.keyThemes.map((theme) => (
               <Badge
-                key={i}
+                key={theme}
                 variant="secondary"
                 className="text-xs"
               >
