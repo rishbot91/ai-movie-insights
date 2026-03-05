@@ -29,7 +29,6 @@ export default function HomePage() {
 
     try {
 
-      // const res = await fetch(`/api/movie?imdbId=${id}`)
       const res = await fetch(`/api/insights?imdbId=${id}`)
       const data = await res.json()
 
@@ -43,17 +42,6 @@ export default function HomePage() {
 
       setMovie(data.movie)
       setSentiment(data.sentiment)
-
-      // Temporary sentiment data (replace later with AI)
-      // setSentiment({
-      //   sentimentLabel: "Positive",
-      //   sentimentScore: 82,
-      //   summary:
-      //     "Audience reactions are largely positive, praising the performances, direction, and engaging storyline.",
-      //   keyThemes: ["Performances", "Storytelling", "Cinematography"],
-      //   audienceAppeal:
-      //     "Strong appeal for viewers who enjoy visually rich films with compelling characters and dramatic storytelling.",
-      // })
 
     } catch (err: unknown) {
 
@@ -109,20 +97,28 @@ export default function HomePage() {
         {/* Results */}
         {movie && !loading && (
           <div className="flex flex-col gap-6">
+
             <MovieCard movie={movie} />
-            {sentiment && <SentimentCard sentiment={sentiment} />}
+
+            {sentiment && (
+              <SentimentCard sentiment={sentiment} />
+            )}
+
           </div>
         )}
 
         {/* Empty State */}
         {!movie && !loading && !error && (
           <div className="flex flex-col items-center gap-2 py-16 text-center">
+
             <p className="text-sm text-muted-foreground">
               Enter an IMDb ID above to get started
             </p>
+
             <p className="text-xs text-muted-foreground/60">
               Tip: Example — imdb.com/title/tt1375666
             </p>
+
           </div>
         )}
 
