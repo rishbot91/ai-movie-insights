@@ -1,13 +1,15 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 
 export function MovieCardSkeleton() {
   return (
     <Card className="overflow-hidden border-border bg-card animate-in fade-in duration-300">
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
-          <Skeleton className="aspect-[2/3] w-full sm:w-64 shrink-0" />
+          <div className="shrink-0 sm:w-64 p-4">
+            <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          </div>
           <div className="flex flex-1 flex-col gap-4 p-5">
             <div className="flex flex-col gap-2">
               <Skeleton className="h-7 w-3/4" />
@@ -38,7 +40,7 @@ export function MovieCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function SentimentCardSkeleton() {
@@ -80,5 +82,5 @@ export function SentimentCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

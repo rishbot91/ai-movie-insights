@@ -29,7 +29,8 @@ export default function HomePage() {
 
     try {
 
-      const res = await fetch(`/api/movie?imdbId=${id}`)
+      // const res = await fetch(`/api/movie?imdbId=${id}`)
+      const res = await fetch(`/api/insights?imdbId=${id}`)
       const data = await res.json()
 
       if (!res.ok) {
@@ -40,18 +41,19 @@ export default function HomePage() {
         throw new Error(data.Error || "Movie not found")
       }
 
-      setMovie(data)
+      setMovie(data.movie)
+      setSentiment(data.sentiment)
 
       // Temporary sentiment data (replace later with AI)
-      setSentiment({
-        sentimentLabel: "Positive",
-        sentimentScore: 82,
-        summary:
-          "Audience reactions are largely positive, praising the performances, direction, and engaging storyline.",
-        keyThemes: ["Performances", "Storytelling", "Cinematography"],
-        audienceAppeal:
-          "Strong appeal for viewers who enjoy visually rich films with compelling characters and dramatic storytelling.",
-      })
+      // setSentiment({
+      //   sentimentLabel: "Positive",
+      //   sentimentScore: 82,
+      //   summary:
+      //     "Audience reactions are largely positive, praising the performances, direction, and engaging storyline.",
+      //   keyThemes: ["Performances", "Storytelling", "Cinematography"],
+      //   audienceAppeal:
+      //     "Strong appeal for viewers who enjoy visually rich films with compelling characters and dramatic storytelling.",
+      // })
 
     } catch (err: unknown) {
 

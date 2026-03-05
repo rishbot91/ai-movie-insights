@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 const EXAMPLE_MOVIES = [
   { id: "tt1375666", title: "Inception" },
   { id: "tt0111161", title: "Shawshank Redemption" },
+  { id: "tt33014583", title: "Dhurandhar" },
   { id: "tt0468569", title: "The Dark Knight" },
-  { id: "tt0137523", title: "Fight Club" },
   { id: "tt0120737", title: "LOTR: Fellowship" },
 ]
 
